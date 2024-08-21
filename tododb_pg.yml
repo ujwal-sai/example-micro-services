@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-todo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres-todo
+  template:
+    metadata:
+      labels:
+        app: postgres-todo
+    spec:
+      containers:
+        - name: postgres-todo
+          image: 'postgres:14'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5432
+          envFrom:
+            - configMapRef:
+                name: postgres-secret-todo
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgresdata
+      volumes:
+        - name: postgresdata
+          persistentVolumeClaim:
+            claimName: postgres-volume-claim-todo

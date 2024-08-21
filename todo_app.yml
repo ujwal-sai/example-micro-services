@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: todo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: todo
+  template:
+    metadata:
+      labels:
+        app: todo
+    spec:
+      containers:
+      - name: todo
+        image: us-central1-docker.pkg.dev/upbeat-beach-430205-r4/todo/msalab01/todo:v5
+        env:
+        - name: POSTGRES_ENABLED
+          value: "1"
+        - name: FLASK_ENV
+          value: "production"
+        - name: DB_HOST
+          value: postgres-todo
+        - name: DB_USER
+          valueFrom:
+            configMapKeyRef:
+              name: postgres-secret-todo
+              key: POSTGRES_USER
+        - name: DB_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: postgres-secret-todo
+              key: POSTGRES_DB
+        - name: DB_PASSWORD
+          valueFrom:
+            configMapKeyRef:
+              name: postgres-secret-todo
+              key: POSTGRES_PASSWORD
+        - name: DB_PORT
+          value: "5432"
+        - name: AUTH_SERVICE_NAME
+          value: "auth-service"
+        - name: AUTH_SERVICE_PORT
+          value: "8000"
+        ports:
+        - containerPort: 5000

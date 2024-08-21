@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth
+  template:
+    metadata:
+      labels:
+        app: auth
+    spec:
+      containers:
+      - name: auth
+        image: us-central1-docker.pkg.dev/upbeat-beach-430205-r4/auth/msalab01/auth:v2
+        env:
+        - name: POSTGRES_ENABLED
+          value: "1"
+        - name: DB_HOST
+          value: postgres
+        - name: DB_USER
+          valueFrom:
+            configMapKeyRef:
+              name: postgres-secret
+              key: POSTGRES_USER
+        - name: DB_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: postgres-secret
+              key: POSTGRES_DB
+        - name: DB_PASSWORD
+          valueFrom:
+            configMapKeyRef:
+              name: postgres-secret
+              key: POSTGRES_PASSWORD
+        - name: DB_PORT
+          value: "5432"
+        ports:
+        - containerPort: 8000
